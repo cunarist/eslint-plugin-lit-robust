@@ -84,7 +84,9 @@
     "ruleListColumns": [
       "name",
       "description",
-      "configsError"
+      "configsError",
+      "fixable",
+      "hasSuggestions"
     ],
     "ruleDocSectionInclude": [
       "Rule Details",
