@@ -3,9 +3,9 @@
 Your Lit component type-checks, the build is green, and the list still won't
 re-render. No error, no warning, just a stale screen.
 
-`lit-robust` catches the [Lit](https://lit.dev) bugs that compile fine but break
-at runtime, so you find them before your users do. Runs on
-[ESLint](https://eslint.org) and [Oxlint](https://oxc.rs/docs/guide/usage/linter).
+`lit-robust` catches the [Lit](https://lit.dev) bugs your compiler can't see,
+at lint time instead of in a bug report. Runs on [ESLint](https://eslint.org)
+and [Oxlint](https://oxc.rs/docs/guide/usage/linter).
 
 ```ts
 class TodoList extends LitElement {
@@ -24,9 +24,9 @@ class TodoList extends LitElement {
 
 A few more quiet ones it spots:
 
-- An `async render()` that renders nothing at all
+- An `async render()` that paints "[object Promise]" instead of your template
   ([`no-async-render`](docs/rules/no-async-render.md)).
-- A class field that silently replaces Lit's reactive accessor
+- A class field that quietly un-reacts a reactive property
   ([`no-classfield-shadowing`](docs/rules/no-classfield-shadowing.md)).
 - A write in `updated()` that renders every change twice
   ([`no-property-change-in-updated`](docs/rules/no-property-change-in-updated.md)).

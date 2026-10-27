@@ -9,10 +9,10 @@
 ## Rule Details
 
 An `async` method returns a Promise, and Lit commits whatever `render()` returns
-directly into the DOM. A Promise is not a renderable value, so the component
-renders nothing at all: not a loading state, not stale markup, nothing. The
-awaited work still runs, so the bug looks like a data problem rather than a
-rendering one. Fetch the data elsewhere, store it in a reactive property, and
+directly into the DOM. A Promise is not a template, node, or iterable, so Lit
+falls back to its string form and the component shows the literal text
+`[object Promise]` instead of your template, every render. The awaited result
+is never rendered. Fetch the data elsewhere, store it in a reactive property, and
 render that synchronously.
 
 - Only `render` is checked. Async lifecycle hooks are covered by
