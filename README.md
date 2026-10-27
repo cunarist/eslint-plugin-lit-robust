@@ -1,11 +1,11 @@
 # eslint-plugin-lit-robust
 
-Lint rules that catch [Lit](https://lit.dev) web component bugs that still compile.
-Runs on [ESLint](https://eslint.org) and [Oxlint](https://oxc.rs/docs/guide/usage/linter).
+Your Lit component type-checks, the build is green, and the list still won't
+re-render. No error, no warning, just a stale screen.
 
-Lit code can type-check and still fail quietly at runtime: an update that never
-renders, a binding Lit ignores, a template that is not valid HTML. These rules
-report those mistakes at lint time.
+`lit-robust` catches the [Lit](https://lit.dev) bugs that compile fine but break
+at runtime, so you find them before your users do. Runs on
+[ESLint](https://eslint.org) and [Oxlint](https://oxc.rs/docs/guide/usage/linter).
 
 ```ts
 class TodoList extends LitElement {
@@ -13,14 +13,25 @@ class TodoList extends LitElement {
   accessor items: string[] = [];
 
   add(item: string): void {
-    // ❌ no-array-mutation-without-reassign: Lit does not see the change
+    // ❌ no-array-mutation-without-reassign: same array, so Lit sees no change
     // this.items.push(item);
 
-    // ✅ a new array, so Lit sees the change and re-renders
+    // ✅ a new array, so Lit re-renders
     this.items = [...this.items, item];
   }
 }
 ```
+
+A few more quiet ones it spots:
+
+- An `async render()` that renders nothing at all
+  ([`no-async-render`](docs/rules/no-async-render.md)).
+- A class field that silently replaces Lit's reactive accessor
+  ([`no-classfield-shadowing`](docs/rules/no-classfield-shadowing.md)).
+- A write in `updated()` that renders every change twice
+  ([`no-property-change-in-updated`](docs/rules/no-property-change-in-updated.md)).
+- An unclosed tag that swallows its siblings
+  ([`no-invalid-html`](docs/rules/no-invalid-html.md)).
 
 ## Install
 
