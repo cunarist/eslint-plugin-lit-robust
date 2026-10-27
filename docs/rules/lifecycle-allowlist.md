@@ -35,13 +35,15 @@ Examples of **incorrect** code for this rule:
 
 ```ts
 class El extends LitElement {
+  #timer?: ReturnType<typeof setInterval>;
+
   connectedCallback() {
     super.connectedCallback();
-    this.#observer.observe(this);
+    this.#timer = setInterval(() => this.requestUpdate(), 1000);
   }
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.#observer.disconnect();
+    clearInterval(this.#timer);
   }
 }
 ```
@@ -49,13 +51,35 @@ class El extends LitElement {
 Examples of **correct** code for this rule:
 
 ```ts
+class ClockController implements ReactiveController {
+  now = new Date();
+  #host: ReactiveControllerHost;
+  #timer?: ReturnType<typeof setInterval>;
+
+  constructor(host: ReactiveControllerHost) {
+    this.#host = host;
+    host.addController(this);
+  }
+
+  hostConnected(): void {
+    this.#timer = setInterval(() => {
+      this.now = new Date();
+      this.#host.requestUpdate();
+    }, 1000);
+  }
+  hostDisconnected(): void {
+    clearInterval(this.#timer);
+  }
+}
+
 class El extends LitElement {
-  #size = new SizeController(this);
+  #clock = new ClockController(this);
 
   static styles = css``;
 
   render() {
-    return html``;
+    const time = this.#clock.now.toLocaleTimeString();
+    return html`<p>${time}</p>`;
   }
 }
 ```
