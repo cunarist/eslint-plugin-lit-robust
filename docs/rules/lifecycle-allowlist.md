@@ -35,15 +35,15 @@ Examples of **incorrect** code for this rule:
 
 ```ts
 class El extends LitElement {
-  #observer = new ResizeObserver(this.#onResize);
+  #timer?: ReturnType<typeof setInterval>;
 
   connectedCallback() {
     super.connectedCallback();
-    this.#observer.observe(this);
+    this.#timer = setInterval(() => this.requestUpdate(), 1000);
   }
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.#observer.disconnect();
+    clearInterval(this.#timer);
   }
 }
 ```
@@ -51,34 +51,35 @@ class El extends LitElement {
 Examples of **correct** code for this rule:
 
 ```ts
-class SizeController implements ReactiveController {
-  width = 0;
-  #host: ReactiveControllerHost & HTMLElement;
-  #observer = new ResizeObserver(([entry]) => {
-    this.width = entry.contentRect.width;
-    this.#host.requestUpdate();
-  });
+class ClockController implements ReactiveController {
+  now = new Date();
+  #host: ReactiveControllerHost;
+  #timer?: ReturnType<typeof setInterval>;
 
   constructor(host: ReactiveControllerHost) {
-    this.#host = host as ReactiveControllerHost & HTMLElement;
+    this.#host = host;
     host.addController(this);
   }
 
   hostConnected(): void {
-    this.#observer.observe(this.#host);
+    this.#timer = setInterval(() => {
+      this.now = new Date();
+      this.#host.requestUpdate();
+    }, 1000);
   }
   hostDisconnected(): void {
-    this.#observer.disconnect();
+    clearInterval(this.#timer);
   }
 }
 
 class El extends LitElement {
-  #size = new SizeController(this);
+  #clock = new ClockController(this);
 
   static styles = css``;
 
   render() {
-    return html`<p>${this.#size.width}px</p>`;
+    const time = this.#clock.now.toLocaleTimeString();
+    return html`<p>${time}</p>`;
   }
 }
 ```
