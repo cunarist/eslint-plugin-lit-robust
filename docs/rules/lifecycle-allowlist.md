@@ -35,6 +35,8 @@ Examples of **incorrect** code for this rule:
 
 ```ts
 class El extends LitElement {
+  #observer = new ResizeObserver(this.#onResize);
+
   connectedCallback() {
     super.connectedCallback();
     this.#observer.observe(this);
@@ -49,13 +51,34 @@ class El extends LitElement {
 Examples of **correct** code for this rule:
 
 ```ts
+class SizeController implements ReactiveController {
+  width = 0;
+  #host: ReactiveControllerHost & HTMLElement;
+  #observer = new ResizeObserver(([entry]) => {
+    this.width = entry.contentRect.width;
+    this.#host.requestUpdate();
+  });
+
+  constructor(host: ReactiveControllerHost) {
+    this.#host = host as ReactiveControllerHost & HTMLElement;
+    host.addController(this);
+  }
+
+  hostConnected(): void {
+    this.#observer.observe(this.#host);
+  }
+  hostDisconnected(): void {
+    this.#observer.disconnect();
+  }
+}
+
 class El extends LitElement {
   #size = new SizeController(this);
 
   static styles = css``;
 
   render() {
-    return html``;
+    return html`<p>${this.#size.width}px</p>`;
   }
 }
 ```
