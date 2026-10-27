@@ -1,10 +1,11 @@
 # eslint-plugin-lit-robust
 
-[Lit](https://lit.dev) web component rules for both [ESLint](https://eslint.org) and [Oxlint](https://oxc.rs/docs/guide/usage/linter): they catch the Lit mistakes that still compile.
+Lint rules that catch [Lit](https://lit.dev) web component bugs that still compile.
+Runs on [ESLint](https://eslint.org) and [Oxlint](https://oxc.rs/docs/guide/usage/linter).
 
 Lit code can type-check and still fail quietly at runtime: an update that never
-renders, a binding Lit ignores, a template that is not valid HTML. These 83
-rules report those mistakes at lint time.
+renders, a binding Lit ignores, a template that is not valid HTML. These rules
+report those mistakes at lint time.
 
 ```ts
 class TodoList extends LitElement {
@@ -12,8 +13,11 @@ class TodoList extends LitElement {
   accessor items: string[] = [];
 
   add(item: string): void {
-    this.items.push(item); // ❌ no-array-mutation-without-reassign: Lit never re-renders
-    this.items = [...this.items, item]; // ✅ a new array, so Lit sees the change
+    // ❌ no-array-mutation-without-reassign: Lit does not see the change
+    // this.items.push(item);
+
+    // ✅ a new array, so Lit sees the change and re-renders
+    this.items = [...this.items, item];
   }
 }
 ```
@@ -21,7 +25,10 @@ class TodoList extends LitElement {
 ## Install
 
 ```sh
-npm install --save-dev eslint-plugin-lit-robust
+# ESLint
+npm install --save-dev eslint eslint-plugin-lit-robust typescript-eslint jiti
+# Oxlint, through Vite+
+npm install --save-dev vite-plus eslint-plugin-lit-robust
 ```
 
 Requires Node.js 22.18+, and `lit` installed where the linted code is.
@@ -32,7 +39,7 @@ The package's only export is the plugin. Its flat configs are at
 `plugin.configs`; combine as many as you want.
 
 ```ts
-// ESLint 9: eslint.config.ts (loading a .ts config needs jiti)
+// ESLint 9+: eslint.config.ts (needs jiti)
 import plugin from "eslint-plugin-lit-robust";
 import { parser } from "typescript-eslint";
 const ts = { files: ["**/*.ts"], languageOptions: { parser } };
@@ -60,14 +67,14 @@ tell.
 
 ## Configs and rules
 
-| Config                | Rules | What it enforces                                                               |
-| :-------------------- | ----: | :----------------------------------------------------------------------------- |
-| `core`                |    52 | Lit code that does not do what it looks like it does. Start here.              |
-| `strict`              |    13 | Demanding, but correct.                                                        |
-| `dom-ref`             |     4 | Reach the DOM through a `createRef` ref, nothing else.                         |
-| `reactive-controller` |     7 | Anything with a lifetime (timers, listeners, `fetch`) belongs in a controller. |
-| `naming`              |     7 | What elements, controllers, attributes, and events are called.                 |
-| `all`                 |    83 | Every rule, including ones added later.                                        |
+| Config                | What it enforces                                                                             |
+| :-------------------- | :------------------------------------------------------------------------------------------- |
+| `core`                | Lit code that does not do what it looks like it does. Start here.                            |
+| `strict`              | Stricter Lit style: decorators, a directive allowlist, tag and event maps, no manual update. |
+| `dom-ref`             | Reach the DOM through a `createRef` ref, nothing else.                                       |
+| `reactive-controller` | Anything with a lifetime (timers, listeners, `fetch`) belongs in a controller.               |
+| `naming`              | What elements, controllers, attributes, and events are called.                               |
+| `all`                 | Every rule, including ones added later.                                                      |
 
 Each rule belongs to exactly one config besides `all`. Rules take no options;
 each links to its docs with incorrect and correct examples.
