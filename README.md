@@ -26,6 +26,10 @@ A few more quiet ones it spots:
 
 - An `async render()` that paints "[object Promise]" instead of your template
   ([`no-async-render`](docs/rules/no-async-render.md)).
+- A listener or observer started in `connectedCallback` that a tangled
+  `disconnectedCallback` forgets to release, leaking on every re-attach
+  ([`lifecycle-allowlist`](docs/rules/lifecycle-allowlist.md),
+  [`paired-lifecycle`](docs/rules/paired-lifecycle.md)).
 - A class field that quietly un-reacts a reactive property
   ([`no-classfield-shadowing`](docs/rules/no-classfield-shadowing.md)).
 - A write in `updated()` that renders every change twice
