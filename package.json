@@ -52,6 +52,14 @@
     "lit": "^3.3.3",
     "vite-plus": "^1.1.0"
   },
+  "peerDependencies": {
+    "eslint": ">=9"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": ">=22.18"
   },

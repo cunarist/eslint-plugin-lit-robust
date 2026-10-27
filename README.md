@@ -36,7 +36,7 @@ A few more quiet ones it spots:
 ## Install
 
 ```sh
-# ESLint
+# ESLint 9+
 npm install --save-dev eslint eslint-plugin-lit-robust typescript-eslint jiti
 # Oxlint, through Vite+
 npm install --save-dev vite-plus eslint-plugin-lit-robust
